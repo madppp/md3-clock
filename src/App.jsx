@@ -36,6 +36,7 @@ export default function MD3Clock() {
   const [wakeLockSupported, setWakeLockSupported] = useState(false);
   const [showUI, setShowUI]             = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [fullscreenDismissed, setFullscreenDismissed] = useState(false);
   const hideTimerRef = useRef(null);
   const wakeLockRef  = useRef(null);
 
@@ -122,7 +123,13 @@ export default function MD3Clock() {
     setShowUI(true);
     clearTimeout(hideTimerRef.current);
     hideTimerRef.current = setTimeout(() => setShowUI(false), 4000);
-  }, []);
+    // 初回タップ時に自動でフルスクリーンをリクエスト
+    if (!document.fullscreenElement && !fullscreenDismissed) {
+      document.documentElement.requestFullscreen().catch(() => {
+        setFullscreenDismissed(true); // 失敗したら諦める
+      });
+    }
+  }, [fullscreenDismissed]);
 
   useEffect(() => { resetHideTimer(); return () => clearTimeout(hideTimerRef.current); }, [resetHideTimer]);
 
@@ -399,17 +406,22 @@ export default function MD3Clock() {
         </button>
       </div>
 
-      {/* クレジット */}
+      {/* クレジット + PWA ヒント */}
       {!isFullscreen && (
         <div style={{
           ...uiStyle,
-          position: "fixed", bottom: 14, left: 16,
-          color: tk.onSurfaceVariant, fontSize: 9,
-          opacity: showUI ? 0.35 : 0,
-          fontFamily: "monospace", letterSpacing: "0.3px",
+          position: "fixed", bottom: 14, left: 16, right: 80,
+          color: tk.onSurfaceVariant, fontSize: 10,
+          opacity: showUI ? 0.5 : 0,
+          letterSpacing: "0.3px",
           transition: "opacity 0.6s",
+          display: "flex", flexDirection: "column", gap: 4,
         }}>
-          MD3 Clock · Phase 1
+          <span style={{ fontFamily: "monospace", fontSize: 9 }}>MD3 Clock · Phase 1</span>
+          <span>
+            <span className="material-symbols-outlined" style={{ fontSize: 12, verticalAlign: "middle", color: tk.primary }}>download</span>
+            {" "}ブラウザメニュー →「ホーム画面に追加」で完全全画面表示
+          </span>
         </div>
       )}
     </div>
