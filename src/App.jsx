@@ -216,6 +216,7 @@ export default function MD3Clock() {
         transition: "background 0.5s cubic-bezier(0.2,0,0,1)",
         position: "relative",
         userSelect: "none", overflow: "hidden",
+        maxWidth: "100vw", maxHeight: "100dvh",
         cursor: showUI ? "default" : "none",
       }}
     >
@@ -231,7 +232,7 @@ export default function MD3Clock() {
       {/* ── 日付（常時表示 / UI 非表示の対象外） ── */}
       <div style={{
         color: tk.onSurfaceVariant,
-        fontSize: "clamp(12px, 3vw, 15px)",
+        fontSize: "clamp(16px, 4.5vw, 28px)",
         fontWeight: 500,
         letterSpacing: "0.5px",
         marginBottom: "clamp(8px, 2vh, 16px)",
@@ -242,13 +243,13 @@ export default function MD3Clock() {
 
       {/* ── 時刻 ── */}
       <div style={{ display: "flex", alignItems: "center", gap: 0, lineHeight: 1 }}>
-        <DigitPair value={hours}   color={tk.onSurface}       size="clamp(100px, 40vw, 280px)" />
+        <DigitPair value={hours}   color={tk.onSurface}       size="clamp(60px, 22vw, 180px)" />
         <Colon color={tk.primary}           sizeEm={0.55} />
-        <DigitPair value={minutes} color={tk.onSurface}       size="clamp(100px, 40vw, 280px)" />
+        <DigitPair value={minutes} color={tk.onSurface}       size="clamp(60px, 22vw, 180px)" />
         {showSeconds && (
           <>
             <Colon color={tk.onSurfaceVariant} sizeEm={0.38} />
-            <DigitPair value={seconds} color={tk.onSurfaceVariant} size="clamp(60px, 23vw, 170px)" />
+            <DigitPair value={seconds} color={tk.onSurfaceVariant} size="clamp(36px, 13vw, 108px)" />
           </>
         )}
       </div>
@@ -488,7 +489,7 @@ function AnimatedDigit({ digit, color, size }) {
 function Colon({ color, sizeEm }) {
   return (
     <span style={{
-      fontSize: `calc(clamp(100px, 40vw, 280px) * ${sizeEm})`,
+      fontSize: `calc(clamp(60px, 22vw, 180px) * ${sizeEm})`,
       fontWeight: 200, color, lineHeight: 1,
       animation: "colonBlink 1s step-end infinite",
       transition: "color 0.5s ease",
