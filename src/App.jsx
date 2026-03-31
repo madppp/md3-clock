@@ -119,12 +119,12 @@ export default function MD3Clock() {
   }, []);
 
   // ── UI 自動非表示（4秒） ──────────────────────────────────
-  const resetHideTimer = useCallback(() => {
+  const resetHideTimer = useCallback((fromUser = false) => {
     setShowUI(true);
     clearTimeout(hideTimerRef.current);
     hideTimerRef.current = setTimeout(() => setShowUI(false), 4000);
-    // 初回タップ時に自動でフルスクリーンをリクエスト
-    if (!document.fullscreenElement && !fullscreenDismissed) {
+    // ユーザー操作時のみフルスクリーンをリクエスト
+    if (fromUser && !document.fullscreenElement && !fullscreenDismissed) {
       document.documentElement.requestFullscreen().catch(() => {
         setFullscreenDismissed(true); // 失敗したら諦める
       });
@@ -212,8 +212,8 @@ export default function MD3Clock() {
 
   return (
     <div
-      onClick={resetHideTimer}
-      onTouchStart={resetHideTimer}
+      onClick={() => resetHideTimer(true)}
+      onTouchStart={() => resetHideTimer(true)}
       style={{
         height: "100dvh", width: "100%",
         background: tk.bg,
