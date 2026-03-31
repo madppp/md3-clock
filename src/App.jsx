@@ -215,7 +215,7 @@ export default function MD3Clock() {
       onClick={resetHideTimer}
       onTouchStart={resetHideTimer}
       style={{
-        minHeight: "100dvh", width: "100%",
+        height: "100dvh", width: "100%",
         background: tk.bg,
         display: "flex", flexDirection: "column",
         alignItems: "center", justifyContent: "center",
