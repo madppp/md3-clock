@@ -36,7 +36,6 @@ export default function MD3Clock() {
   const [wakeLockSupported, setWakeLockSupported] = useState(false);
   const [showUI, setShowUI]             = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [fullscreenDismissed, setFullscreenDismissed] = useState(false);
   const hideTimerRef = useRef(null);
   const wakeLockRef  = useRef(null);
 
@@ -119,17 +118,11 @@ export default function MD3Clock() {
   }, []);
 
   // ── UI 自動非表示（4秒） ──────────────────────────────────
-  const resetHideTimer = useCallback((fromUser = false) => {
+  const resetHideTimer = useCallback(() => {
     setShowUI(true);
     clearTimeout(hideTimerRef.current);
     hideTimerRef.current = setTimeout(() => setShowUI(false), 4000);
-    // ユーザー操作時のみフルスクリーンをリクエスト
-    if (fromUser && !document.fullscreenElement && !fullscreenDismissed) {
-      document.documentElement.requestFullscreen().catch(() => {
-        setFullscreenDismissed(true); // 失敗したら諦める
-      });
-    }
-  }, [fullscreenDismissed]);
+  }, []);
 
   useEffect(() => { resetHideTimer(); return () => clearTimeout(hideTimerRef.current); }, [resetHideTimer]);
 
@@ -155,8 +148,20 @@ export default function MD3Clock() {
 
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
-        (pos) => fetchWeather(pos.coords.latitude, pos.coords.longitude, "現在地"),
-        () => fetchWeather(35.6812, 139.7671, "東京") // 拒否時は東京
+        async (pos) => {
+          const { latitude, longitude } = pos.coords;
+          let locationName = "現在地";
+          try {
+            const res = await fetch(
+              `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&accept-language=ja`
+            );
+            const data = await res.json();
+            const addr = data.address;
+            locationName = addr.city_district || addr.suburb || addr.city || addr.town || addr.village || "現在地";
+          } catch (e) {}
+          fetchWeather(latitude, longitude, locationName);
+        },
+        () => fetchWeather(35.6812, 139.7671, "東京")
       );
     } else {
       fetchWeather(35.6812, 139.7671, "東京");
@@ -212,8 +217,8 @@ export default function MD3Clock() {
 
   return (
     <div
-      onClick={() => resetHideTimer(true)}
-      onTouchStart={() => resetHideTimer(true)}
+      onClick={resetHideTimer}
+      onTouchStart={resetHideTimer}
       style={{
         height: "100dvh", width: "100%",
         background: tk.bg,
@@ -223,7 +228,6 @@ export default function MD3Clock() {
         transition: "background 0.5s cubic-bezier(0.2,0,0,1)",
         position: "relative",
         userSelect: "none", overflow: "hidden",
-        maxWidth: "100vw", maxHeight: "100dvh",
         cursor: showUI ? "default" : "none",
       }}
     >
@@ -239,11 +243,12 @@ export default function MD3Clock() {
       {/* ── 日付（常時表示 / UI 非表示の対象外） ── */}
       <div style={{
         color: tk.onSurfaceVariant,
-        fontSize: "clamp(16px, 4.5vw, 28px)",
-        fontWeight: 500,
-        letterSpacing: "0.5px",
+        fontSize: "clamp(28px, 7vw, 42px)",
+        fontWeight: 300,
+        letterSpacing: "-0.5px",
         marginBottom: "clamp(8px, 2vh, 16px)",
         transition: "color 0.5s ease",
+        fontFamily: "'Roboto Flex', sans-serif",
       }}>
         {dateStr}
       </div>
@@ -406,22 +411,17 @@ export default function MD3Clock() {
         </button>
       </div>
 
-      {/* クレジット + PWA ヒント */}
+      {/* クレジット */}
       {!isFullscreen && (
         <div style={{
           ...uiStyle,
-          position: "fixed", bottom: 14, left: 16, right: 80,
-          color: tk.onSurfaceVariant, fontSize: 10,
-          opacity: showUI ? 0.5 : 0,
-          letterSpacing: "0.3px",
+          position: "fixed", bottom: 14, left: 16,
+          color: tk.onSurfaceVariant, fontSize: 9,
+          opacity: showUI ? 0.35 : 0,
+          fontFamily: "monospace", letterSpacing: "0.3px",
           transition: "opacity 0.6s",
-          display: "flex", flexDirection: "column", gap: 4,
         }}>
-          <span style={{ fontFamily: "monospace", fontSize: 9 }}>MD3 Clock · Phase 1</span>
-          <span>
-            <span className="material-symbols-outlined" style={{ fontSize: 12, verticalAlign: "middle", color: tk.primary }}>download</span>
-            {" "}ブラウザメニュー →「ホーム画面に追加」で完全全画面表示
-          </span>
+          MD3 Clock · Phase 1
         </div>
       )}
     </div>
