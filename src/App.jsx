@@ -254,11 +254,11 @@ export default function MD3Clock() {
         marginBottom: "clamp(8px, 2vh, 16px)",
         transition: "color 0.5s ease",
         fontFamily: "'Roboto Flex', sans-serif",
+        textAlign: "center",
       }}>
         <Num>{now.getFullYear()}</Num><Kan>年</Kan>
         <Num>{now.getMonth() + 1}</Num><Kan>月</Kan>
-        <Num>{now.getDate()}</Num><Kan>日</Kan>
-        <Num>（</Num><Kan>{days[now.getDay()]}</Kan><Num>）</Num>
+        <Num>{now.getDate()}</Num><Kan>日（{days[now.getDay()]}）</Kan>
       </div>
 
       {/* ── 時刻 ── */}
