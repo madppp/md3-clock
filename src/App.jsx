@@ -43,7 +43,7 @@ export default function MD3Clock() {
   useEffect(() => {
     const el = document.createElement("style");
     el.textContent = `
-      @import url('https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,100..900&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,200,0,0&display=swap');
+      @import url('https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,100..900&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,200,0,0&family=Noto+Sans+JP:wght@100&display=swap');
       @keyframes digitIn  { from { transform: translateY(80%);  opacity: 0; } to { transform: translateY(0);   opacity: 1; } }
       @keyframes digitOut { from { transform: translateY(0);    opacity: 1; } to { transform: translateY(-80%); opacity: 0; } }
       @keyframes colonBlink { 0%,49%{opacity:1} 50%,100%{opacity:.15} }
@@ -207,7 +207,12 @@ export default function MD3Clock() {
   const minutes = pad(now.getMinutes());
   const seconds = pad(now.getSeconds());
   const days    = ["日", "月", "火", "水", "木", "金", "土"];
-  const dateStr = `${now.getFullYear()}年${now.getMonth() + 1}月${now.getDate()}日（${days[now.getDay()]}）`;
+  const Num = ({ children }) => (
+    <span style={{ fontFamily: "'Roboto Flex'", fontWeight: 200 }}>{children}</span>
+  );
+  const Kan = ({ children }) => (
+    <span style={{ fontFamily: "'Noto Sans JP'", fontWeight: 100 }}>{children}</span>
+  );
 
   const uiStyle = {
     transition: "opacity 0.6s cubic-bezier(0.2,0,0,1)",
@@ -250,7 +255,10 @@ export default function MD3Clock() {
         transition: "color 0.5s ease",
         fontFamily: "'Roboto Flex', sans-serif",
       }}>
-        {dateStr}
+        <Num>{now.getFullYear()}</Num><Kan>年</Kan>
+        <Num>{now.getMonth() + 1}</Num><Kan>月</Kan>
+        <Num>{now.getDate()}</Num><Kan>日</Kan>
+        <Num>（</Num><Kan>{days[now.getDay()]}</Kan><Num>）</Num>
       </div>
 
       {/* ── 時刻 ── */}
