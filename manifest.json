@@ -4,7 +4,7 @@
   "description": "Material Design 3 時計",
   "start_url": "/md3-clock/",
   "scope": "/md3-clock/",
-  "display": "fullscreen",
+  "display": "standalone",
   "background_color": "#0A0910",
   "theme_color": "#0A0910",
   "orientation": "any",
